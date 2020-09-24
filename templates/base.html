@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Minimal Blog</title>
+
+        <!-- Bootstrap core CSS -->
+        <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    </head>
+
+    <body>
+        {% include "navigation.html" %}
+        {% block content %}
+        
+        {% endblock content %}
+        <!-- Footer -->
+        <footer class="py-5 bg-dark">
+            <div class="container">
+                <p class="m-0 text-center text-white">Copyright &copy; flatConcepts 2020</p>
+            </div>
+            <!-- /.container -->
+        </footer>
+        <!-- Bootstrap core JavaScript -->
+        <script src="{{ url_for('static', filename = 'js/jquery.min.js') }}"></script>
+        <script src="{{ url_for('static', filename = 'js/bootstrap.min.js') }}"></script>
+
+    </body>
+
+</html>
