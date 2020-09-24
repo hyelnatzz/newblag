@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
+from datetime import datetime
 
 
 app = Flask(__name__)
@@ -23,9 +24,18 @@ class User(db.Model, UserMixin):
     full_name = db.Column(db.String(100),
                           unique=True,
                           nullable=False)
+    dob = db.Column(db.String(20),
+                          unique=False,
+                          nullable=False)
+    bio = db.Column(db.String(500),
+                          unique=False,
+                          nullable=False)
     password = db.Column(db.String(200),
                          unique=False,
                          nullable=False)
+    date_registered = db.Column(db.String(100), 
+                                nullable = False, 
+                                default=datetime.strftime(datetime.now()))
     posts = db.relationship('Post', backref=db.backref('author'))
 
     def __repr__(self):
@@ -47,13 +57,22 @@ class Post(db.Model, UserMixin):
     body = db.Column(db.Text,
                      unique=False,
                      nullable=False)
-    author_id = db.Column(
-        db.Integer, db.ForeignKey('users.id'), nullable=False)
-    category_id = db.Column(db.Integer, db.ForeignKey(
-        'categories.id'), nullable=False)
+    date_created = db.Column(db.String(100),
+                             nullable=False,
+                             default=datetime.strftime(datetime.now()))
+    tags = db.Column(db.String(50),
+                     unique=False,
+                     nullable=False)
+    author_id = db.Column(db.Integer, 
+                          db.ForeignKey('users.id'), 
+                          nullable=False)
+    category_id = db.Column(db.Integer,
+                            db.ForeignKey('categories.id'), 
+                            nullable=False)
 
     def __repr__(self):
         return '<Post {}>'.format(self.id)
+
 
 
 class Category(db.Model, UserMixin):
