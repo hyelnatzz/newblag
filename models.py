@@ -2,10 +2,11 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from datetime import datetime
-
+import os
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
+app.config['SECRET_KEY'] = os.urandom(8).hex()
 db = SQLAlchemy(app)
 
 
@@ -22,9 +23,9 @@ class User(db.Model, UserMixin):
                       unique=True,
                       nullable=False)
     full_name = db.Column(db.String(100),
-                          unique=True,
+                          unique=False,
                           nullable=False)
-    dob = db.Column(db.String(20),
+    dob = db.Column(db.String,
                           unique=False,
                           nullable=False)
     bio = db.Column(db.String(500),
@@ -33,9 +34,9 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(200),
                          unique=False,
                          nullable=False)
-    date_registered = db.Column(db.String(100), 
+    date_registered = db.Column(db.String, 
                                 nullable = False, 
-                                default=datetime.strftime(datetime.now()))
+                                default=datetime.now())
     posts = db.relationship('Post', backref=db.backref('author'))
 
     def __repr__(self):
@@ -53,16 +54,16 @@ class Post(db.Model, UserMixin):
                       unique=False)
     subtitle = db.Column(db.String(200),
                          unique=False,
-                         nullable=False)
+                         nullable=True)
     body = db.Column(db.Text,
                      unique=False,
                      nullable=False)
-    date_created = db.Column(db.String(100),
+    date_created = db.Column(db.String,
                              nullable=False,
-                             default=datetime.strftime(datetime.now()))
+                             default=datetime.now())
     tags = db.Column(db.String(50),
                      unique=False,
-                     nullable=False)
+                     nullable=True)
     author_id = db.Column(db.Integer, 
                           db.ForeignKey('users.id'), 
                           nullable=False)
@@ -91,3 +92,5 @@ class Category(db.Model, UserMixin):
 
     def __repr__(self):
         return '<Category {}>'.format(self.name)
+
+db.create_all()

@@ -10,17 +10,18 @@
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ml-auto">
                     {% if current_user %}
+                      <li class="nav-item">
+                          <a class="nav-link" href="contact.html">Dashboard</a>
+                      </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="contact.html">Logout</a>
+                            <a class="nav-link" href="/logout">Logout</a>
                         </li>
+
                     {% else %}
                         <li class="nav-item">
                             <a class="nav-link" href="contact.html">Login</a>
                         </li>
                     {% endif %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="contact.html">Contact</a>
-                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="contact.html">Categories</a>
                     </li>
