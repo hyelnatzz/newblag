@@ -4,4 +4,11 @@
 <h1>hello, {{ user.username }}</h1>
 <h3>@>> {{ user.email }}</h3>
 
+{% for post in posts %}
+
+    <li> <a href="/post/{{ post.id }}"> {{ post.title }}</a></li>
+
+{% endfor %}
+    
+
 {% endblock %}

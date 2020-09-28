@@ -6,16 +6,16 @@ from flask_admin.contrib.sqla.view import ModelView
 from flask_bootstrap import Bootstrap
 from models import Post, Category, User
 from flask_sqlalchemy import  SQLAlchemy
-from forms import loginForm, signupForm, categoryForm, contactForm, searchForm
+from forms import loginForm, signupForm, categoryForm, contactForm, searchForm, categories_,postForm
 from flask_admin import Admin
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
+from models import db, app
 
 
-app = Flask(__name__)
-app.config.from_pyfile('config.py')
-app.config['SECRET_KEY'] = os.urandom(8).hex()
-db = SQLAlchemy(app)
+#app = Flask(__name__)
+#app.config.from_pyfile('config.py')
+#app.config['SECRET_KEY'] = os.urandom(8).hex()
 Bootstrap(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -32,22 +32,7 @@ def load(user_id):
 
 
 ###########################################################################################
-from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, TextAreaField,SubmitField
-from wtforms.validators import InputRequired
-categories_ = [c.name for c in Category.query.all()]
 
-
-class postForm(FlaskForm):
-    title = StringField('Post Title', validators=[
-                        InputRequired('post title required')])
-    subtitle = StringField('Post Subtitle')
-    category = SelectField('Select Category', choices=[
-                           (name, name) for name in categories_])
-    body = TextAreaField('Post Body', validators=[
-                         InputRequired('password field cannot be empty')])
-    tags = StringField('Post Tags')
-    submit = SubmitField('Submit')
 ########################################################################################
 
 
@@ -58,7 +43,8 @@ def index():
 @app.route('/user/')
 @login_required
 def userDashboard():
-   return render_template('dashboard.html', user= current_user)
+    user_posts = current_user.posts 
+    return render_template('dashboard.html', user= current_user, posts=user_posts)
 
 @app.route('/signup/', methods=['GET','POST'])
 def signup():
@@ -82,7 +68,7 @@ def signup():
         db.session.add(user)
         db.session.commit()
         return f'{user.username} Success'
-    return render_template('signup.html', form=form, search=search, date=date, categories=categories_)
+    return render_template('signup.html', form=form, search=search, date=date, categories=categories_, current_user=current_user)
 next_ = True
 
 @app.route('/login/', methods=['POST', 'GET'])
@@ -100,11 +86,11 @@ def login():
                 return redirect(form.next.data or url_for('index') )
             else:
                 flash('Invalid password')
-                return render_template('login.html', form=form, search=search, categories=categories_)
+                return render_template('login.html', form=form, search=search, categories=categories_, current_user=current_user)
         else: 
             flash('email not registered')
     form.next.data = request.args.get('next')
-    return render_template('login.html', form=form, search=search, categories = categories_)
+    return render_template('login.html', form=form, search=search, categories = categories_, current_user=current_user)
 
 
 @app.route('/logout/')
@@ -115,7 +101,10 @@ def logout():
 @app.route('/post/<int:post_id>/', methods=['GET'])
 def post(post_id):
     search = searchForm()
-    return render_template('post.html')
+    post = Post.query.filter_by(id=post_id).one()
+    t = datetime.strptime(post.date_created[:-7], '%Y-%m-%d %H:%M:%S%f')
+    f_t = datetime.strftime(t, '%B %d, %Y at %I:%M %p')
+    return render_template('post.html', post=post, date_created = f_t, current_user = current_user)
 
 
 @app.route('/post/new/', methods=['GET','POST'])
@@ -128,24 +117,42 @@ def createPost():
         post.title = form.title.data.strip()
         post.subtitle = form.subtitle.data.strip()
         category = db.session.query(Category).filter_by(name=form.category.data).one()
-        author = db.session.query(User).filter_by(id=current_user.id).one()
         post.category = category
-        post.author = author
+        post.author = current_user
         post.body = form.body.data.strip()
         post.tags = form.tags.data.strip()
         db.session.add(post)
         db.session.commit()
         flash('Post Created Successfully')
-        return redirect( url_for('createPost') )
+        return redirect( url_for('post', post_id = post.id) )
     return render_template('newpost.html', form=form, search=search, categories=categories_)
 
 
-@app.route('/post/edit/<int:post_id>/')
+@app.route('/post/edit/<int:post_id>/', methods=['GET', 'POST'])
+@login_required
 def editPost(post_id):
-   return 'edit post page'
+    form = postForm()
+    search = searchForm()
+    post = db.session.query(Post).filter_by(id=post_id).one()
+    if form.validate_on_submit():
+        post.title = form.title.data.strip()
+        post.subtitle = form.subtitle.data.strip()
+        category = db.session.query(Category).filter_by(
+            name=form.category.data).one()
+        post.category = category
+        post.body = form.body.data.strip()
+        post.tags = form.tags.data.strip()
+        db.session.add(post)
+        db.session.commit()
+        flash('Post Updated Successfully')
+        return redirect(url_for('post', post_id=post.id))
+    print(post.body)
+    return render_template('editpost.html', form=form, search=search, categories=categories_, post=post)
+
 
 
 @app.route('/post/delete/<int:post_id>/')
+@login_required
 def deletePost(post_id):
    return 'delete post page'
 

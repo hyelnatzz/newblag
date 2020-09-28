@@ -1,6 +1,7 @@
 from flask_wtf import  FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, HiddenField, TextAreaField, SubmitField, SelectField
 from wtforms.validators import InputRequired, EqualTo, Length
+from models import Category
 
 
 class loginForm(FlaskForm):
@@ -11,6 +12,20 @@ class loginForm(FlaskForm):
     next = HiddenField('')
     login = SubmitField('Login')
 
+
+categories_ = [c.name for c in Category.query.all()]
+
+
+class postForm(FlaskForm):
+    title = StringField('Post Title', validators=[
+                        InputRequired('post title required')])
+    subtitle = StringField('Post Subtitle')
+    category = SelectField('Select Category', choices=[
+                           (name, name) for name in categories_])
+    body = TextAreaField('Post Body', validators=[
+                         InputRequired('password field cannot be empty')])
+    tags = StringField('Post Tags')
+    submit = SubmitField('Submit')
 
 class signupForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired(message='required field')] )

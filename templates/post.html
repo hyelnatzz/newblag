@@ -4,17 +4,18 @@
 <div class="container">
 
     <!-- Page Heading/Breadcrumbs -->
-    <h1 class="mt-4 mb-3">Post Title
-        <small>by
-            <a href="#">Start Bootstrap</a>
-        </small>
+    <h1 class="mt-4 mb-3">{{ post.title }}
+    
     </h1>
+    <small>by
+        <a href="#">{{ post.author.username }}</a>
+    </small>
 
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
             <a href="index.html">Home</a>
         </li>
-        <li class="breadcrumb-item active">Blog Home 2</li>
+        <li class="breadcrumb-item active">Post {{ post.id }}</li>
     </ol>
 
     <div class="row">
@@ -28,8 +29,7 @@
             <hr>
 
             <!-- Date/Time -->
-            <p>Posted on January 1, 2017 at 12:00 PM</p>
-
+            <p>Posted on {{ date_created }}</p>
             <hr>
 
             <!-- Post Content -->
