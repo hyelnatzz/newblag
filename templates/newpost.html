@@ -9,8 +9,8 @@
 
     {% endfor %}
     <div class="row">
-        <div class="col-lg-2"></div>
-        <div class="col-lg-5 mb-4">
+        <div class="col-lg-1"></div>
+        <div class="col-lg-6 mb-4">
             <div class="card my-4">
                 <div class="card-body">
                     <h3>Create Post</h3>
@@ -47,7 +47,7 @@
             </div>
         </div>
         <!-- Sidebar Widgets Column -->
-        <div class="col-md-3">
+        <div class="col-lg-4">
 
             <!-- Search Widget -->
             <div class="card mb-4">
@@ -66,24 +66,17 @@
 
             <!-- Categories Widget -->
             <div class="card my-4">
-                <h5 class="card-header">Categories</h5>
+                <h5 class="card-header"> <a href="/categories"> Categories</a></h5>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-lg-6">
-                            <ul class="list-unstyled mb-0">
-                                {% for category in categories %}
-                                  <li>
-                                      <a href="#">{{ category }}</a>
-                                  </li>
-                                {% endfor %}
-                                
-                                <li>
-                                    <a href="#">HTML</a>
-                                </li>
-                                <li>
-                                    <a href="#">Freebies</a>
-                                </li>
-                            </ul>
+                             <ul class="list-unstyled mb-0">
+                                 {% for category in cat %}
+                                 <li>
+                                     <a href="/category/{{category.id}}">{{ category.name }}</a>
+                                 </li>
+                                 {% endfor %}
+                             </ul>
                         </div>
                         <div class="col-lg-6">
                             <ul class="list-unstyled mb-0">
@@ -112,7 +105,7 @@
             </div>
 
         </div>
-        <div class="col-lg-2"></div>
+        <div class="col-lg-1"></div>
 
     </div>
     <!-- /.row -->

@@ -38,7 +38,7 @@
                         <div class="control-group form-group mb-2">
                             <div class="controls">
                                 {{ form.body.label }}
-                                {{ form.body(class='form-control', values= post.body) }}
+                                <textarea name="body" id="body" class="form-control" row='20'>{{ post.body }}</textarea>
                             </div>
                         </div>
                         <div class="control-group form-group mb-2">
@@ -73,14 +73,14 @@
 
             <!-- Categories Widget -->
             <div class="card my-4">
-                <h5 class="card-header">Categories</h5>
+                <h5 class="card-header"> <a href="/categories"> Categories </a></h5>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-lg-6">
                             <ul class="list-unstyled mb-0">
                                 {% for category in categories %}
                                 <li>
-                                    <a href="#">{{ category }}</a>
+                                    <a href="/category/{{category.id}}">{{ category.name }}</a>
                                 </li>
                                 {% endfor %}
 

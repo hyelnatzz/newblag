@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-from flask import Flask, flash, redirect,render_template,request
+from flask import flash, redirect,render_template,request
 from flask.helpers import url_for
 from flask_admin.contrib.sqla.view import ModelView
 from flask_bootstrap import Bootstrap
@@ -13,9 +13,6 @@ from flask_login import LoginManager, login_required, login_user, logout_user, c
 from models import db, app
 
 
-#app = Flask(__name__)
-#app.config.from_pyfile('config.py')
-#app.config['SECRET_KEY'] = os.urandom(8).hex()
 Bootstrap(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -34,23 +31,34 @@ def load(user_id):
 ###########################################################################################
 
 ########################################################################################
+def format_date(t):
+    t = datetime.strptime(t[:-7], '%Y-%m-%d %H:%M:%S%f')
+    f_t = datetime.strftime(t, '%B %d, %Y at %I:%M %p')
+    return f_t
 
 
 @app.route('/', methods=['GET','POST'])
 def index():
-    return render_template('index.html')
+    categories = Category.query.all()
+    posts = Post.query.filter_by(published=1)
+    d = {i.id:format_date(i.date_created) for i in posts}
+    return render_template('index.html', current_user=current_user, categories=categories, posts=posts, times = d)
 
 @app.route('/user/')
 @login_required
 def userDashboard():
     user_posts = current_user.posts 
-    return render_template('dashboard.html', user= current_user, posts=user_posts)
+    total_posts = len(user_posts)
+    published_posts = len([i for i in user_posts if i.published == 1])
+    unpublished_posts = len([i for i in user_posts if i.published == 0])
+    return render_template('dashboard.html', user= current_user, posts=user_posts, total_posts=total_posts, published_posts=published_posts, unpublished_posts = unpublished_posts)
 
 @app.route('/signup/', methods=['GET','POST'])
 def signup():
     form = signupForm()
     search = searchForm()
     date = datetime.strftime(datetime.now(), '%d/%m/%Y')
+    categories = Category.query.all()
     if form.validate_on_submit():
         user = User()
         user.username = form.username.data.strip()
@@ -67,14 +75,16 @@ def signup():
         user.password = generate_password_hash(form.password.data.strip(), method='sha256')
         db.session.add(user)
         db.session.commit()
-        return f'{user.username} Success'
-    return render_template('signup.html', form=form, search=search, date=date, categories=categories_, current_user=current_user)
-next_ = True
+        flash('Registration successfull, you can now login')
+        return redirect(url_for('index'))
+    return render_template('signup.html', form=form, search=search, date=date, categories=categories_, current_user=current_user, cat=categories)
+
 
 @app.route('/login/', methods=['POST', 'GET'])
 def login():
     form = loginForm()
     search = searchForm()
+    categories = Category.query.all()
     if form.validate_on_submit():
         email = form.email.data.strip()
         password = form.password.data.strip()
@@ -86,11 +96,11 @@ def login():
                 return redirect(form.next.data or url_for('index') )
             else:
                 flash('Invalid password')
-                return render_template('login.html', form=form, search=search, categories=categories_, current_user=current_user)
+                return render_template('login.html', form=form, search=search, categories=categories, current_user=current_user)
         else: 
             flash('email not registered')
     form.next.data = request.args.get('next')
-    return render_template('login.html', form=form, search=search, categories = categories_, current_user=current_user)
+    return render_template('login.html', form=form, search=search, categories = categories, current_user=current_user)
 
 
 @app.route('/logout/')
@@ -101,10 +111,11 @@ def logout():
 @app.route('/post/<int:post_id>/', methods=['GET'])
 def post(post_id):
     search = searchForm()
+    categories = Category.query.all()
     post = Post.query.filter_by(id=post_id).one()
     t = datetime.strptime(post.date_created[:-7], '%Y-%m-%d %H:%M:%S%f')
     f_t = datetime.strftime(t, '%B %d, %Y at %I:%M %p')
-    return render_template('post.html', post=post, date_created = f_t, current_user = current_user)
+    return render_template('post.html', post=post, date_created=f_t, current_user=current_user, categories=categories)
 
 
 @app.route('/post/new/', methods=['GET','POST'])
@@ -112,6 +123,7 @@ def post(post_id):
 def createPost():
     form = postForm()
     search = searchForm()
+    categories = Category.query.all()
     if form.validate_on_submit():
         post = Post()
         post.title = form.title.data.strip()
@@ -125,7 +137,7 @@ def createPost():
         db.session.commit()
         flash('Post Created Successfully')
         return redirect( url_for('post', post_id = post.id) )
-    return render_template('newpost.html', form=form, search=search, categories=categories_)
+    return render_template('newpost.html', form=form, search=search, categories=categories_, cat=categories)
 
 
 @app.route('/post/edit/<int:post_id>/', methods=['GET', 'POST'])
@@ -160,7 +172,8 @@ def deletePost(post_id):
 @app.route('/category/<int:category_id>/')
 def category(category_id):
     cat = Category.query.filter_by(id=category_id).one()
-    return render_template('category.html', category=cat)
+    members= list(filter(lambda x: x.published, cat.members))
+    return render_template('category.html', category=cat, posts=members)
 
 
 @app.route('/search/')
@@ -169,7 +182,10 @@ def search():
 
 @app.route('/categories/')
 def categories():
-   return 'categories page'
+    search = searchForm()
+    categories = Category.query.all()
+    lengths = {i.name:len(list(filter(lambda x: x.published, i.members))) for i in categories}
+    return render_template('categories.html', categories=categories, lengths=lengths, search=search)
 
 
 

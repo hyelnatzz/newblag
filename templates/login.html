@@ -36,6 +36,7 @@
                         </div>
                         {{ form.login(class = 'btn btn-primary') }} 
                     </form>
+                    <p class="mt-3">or <a href="/signup">Sign Up?</a></p>
                 </div>
             </div>
         </div>
@@ -60,20 +61,16 @@
 
             <!-- Categories Widget -->
             <div class="card my-4">
-                <h5 class="card-header">Categories</h5>
+                <h5 class="card-header"> <a href="/categories"> Categories</a></h5>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
                             <ul class="list-unstyled mb-0">
+                                {% for category in categories %}
                                 <li>
-                                    <a href="#">Web Design</a>
+                                    <a href="/category/{{category.id}}">{{ category.name }}</a>
                                 </li>
-                                <li>
-                                    <a href="#">HTML</a>
-                                </li>
-                                <li>
-                                    <a href="#">Freebies</a>
-                                </li>
+                                {% endfor %}
                             </ul>
                         </div>
                         <div class="col-md-6">

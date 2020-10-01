@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+    <div class="container" , style="margin-top: 40px;">
+
+        {% for message in get_flashed_messages() %}
+        <div class="row"></div>
+        <p class="alert alert-danger">{{message}}</p>
+    </div>
+    {% endfor %}
+    <h1>Categories</h1>
+    <div class="row">
+        <div class="col-lg-2"></div>
+        <div class="col-lg-5 mb-4">
+            <table class="table table-striped">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Post Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category in categories  %}
+                        <tr>
+                            <td><a href="/category/{{ category.id }}"> {{ category.name }}</a> </td>
+                            <td> <span class="badge badge-success"> {{ lengths[category.name] }}</span> </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>            
+            </table>
+        </div>
+        <!-- Sidebar Widgets Column -->
+        <div class="col-md-3">
+
+            <!-- Search Widget -->
+            <div class="card mb-4">
+                <h5 class="card-header">Search</h5>
+                <div class="card-body">
+                    <form action="{{ url_for('search') }}" method="GET">
+                        {{ search.hidden_tag()}}
+                        <div class="input-group">
+                            {{ search.field(placeholder = 'Search for ...', class = 'form-control')}}
+                            <span class="input-group-append">
+                                {{ search.go( class = 'btn btn-secondary') }}
+                            </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Categories Widget -->
+            <div class="card my-4">
+                <h5 class="card-header">Categories</h5>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <ul class="list-unstyled mb-0">
+                                {% for category in categories %}
+                                <li>
+                                    <a href="/category/{{ category.id }}">{{ category.name }}</a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="col-lg-6">
+                            <ul class="list-unstyled mb-0">
+                                <li>
+                                    <a href="#">JavaScript</a>
+                                </li>
+                                <li>
+                                    <a href="#">CSS</a>
+                                </li>
+                                <li>
+                                    <a href="#">Tutorials</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Side Widget -->
+            <div class="card my-4">
+                <h5 class="card-header">Side Widget</h5>
+                <div class="card-body">
+                    You can put anything you want inside of these side widgets. They are easy to use, and feature the
+                    new Bootstrap 4 card containers!
+                </div>
+            </div>
+
+        </div>
+        <div class="col-lg-2"></div>
+
+    </div>
+    <!-- /.row -->
+    </div>
+
+{% endblock %}
+
+<table class="table table-light">
+    <thead class="thead-light">
+        <tr>
+            <th>#</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td></td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>#</th>
+        </tr>
+    </tfoot>
+</table>

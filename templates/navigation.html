@@ -9,21 +9,21 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ml-auto">
-                    {% if current_user %}
-                      <li class="nav-item">
-                          <a class="nav-link" href="contact.html">Dashboard</a>
-                      </li>
+                    {% if current_user.is_anonymous %}
                         <li class="nav-item">
-                            <a class="nav-link" href="/logout">Logout</a>
+                            <a class="nav-link" href="/login">Login</a>
                         </li>
 
                     {% else %}
+                      <li class="nav-item">
+                          <a class="nav-link" href="{{url_for('userDashboard')}}">Dashboard</a>
+                      </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="contact.html">Login</a>
-                        </li>
+                            <a class="nav-link" href="/logout">Logout</a>
+                      </li>
                     {% endif %}
                     <li class="nav-item">
-                        <a class="nav-link" href="contact.html">Categories</a>
+                        <a class="nav-link" href="/categories">Categories</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="about.html">About</a>
@@ -31,6 +31,12 @@
                     <li class="nav-item">
                         <a class="nav-link" href="contact.html">Contact</a>
                     </li>
+                    
+                    {% if current_user.is_authenticated %}              
+                     <li class="nav-item">
+                         <a class="nav-link btn btn-primary" href="{{url_for('userDashboard')}}" style="font-size: x-large; font-weight: bold; padding-top: 0px; padding-bottom: 0px;">{{ current_user.username[0] | capitalize }}</a>
+                     </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
