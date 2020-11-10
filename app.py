@@ -146,6 +146,7 @@ def editPost(post_id):
     form = postForm()
     search = searchForm()
     post = db.session.query(Post).filter_by(id=post_id).one()
+    categories = Category.query.all()
     if form.validate_on_submit():
         post.title = form.title.data.strip()
         post.subtitle = form.subtitle.data.strip()
@@ -159,7 +160,7 @@ def editPost(post_id):
         flash('Post Updated Successfully')
         return redirect(url_for('post', post_id=post.id))
     print(post.body)
-    return render_template('editpost.html', form=form, search=search, categories=categories_, post=post)
+    return render_template('editpost.html', form=form, search=search, categories=categories_, post=post, cat=categories)
 
 
 
